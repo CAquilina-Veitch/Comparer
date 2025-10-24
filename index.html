@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Memorability Ranker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="screen active">
+            <h1>Pokemon Memorability Ranker</h1>
+            <div class="loading-spinner"></div>
+            <p id="loading-text">Loading Pokemon...</p>
+        </div>
+
+        <!-- Main Menu -->
+        <div id="menu-screen" class="screen">
+            <h1>Pokemon Memorability Ranker</h1>
+            <p class="subtitle">Which Pokemon is more memorable?</p>
+            <div class="menu-buttons">
+                <button id="start-ranking-btn" class="btn btn-primary">Start Ranking</button>
+                <button id="view-rankings-btn" class="btn btn-secondary">View Rankings</button>
+                <button id="reset-data-btn" class="btn btn-danger">Reset Data</button>
+            </div>
+            <div class="stats">
+                <p>Total Comparisons: <span id="total-comparisons">0</span></p>
+                <p>Pokemon Loaded: <span id="pokemon-count">0</span></p>
+            </div>
+        </div>
+
+        <!-- Battle Screen -->
+        <div id="battle-screen" class="screen">
+            <div class="header">
+                <button id="back-to-menu-btn" class="btn btn-small">← Menu</button>
+                <div class="comparison-count">Comparison #<span id="current-comparison">0</span></div>
+            </div>
+
+            <h2 class="battle-title">Which is more memorable?</h2>
+
+            <div class="battle-container">
+                <div class="pokemon-card" id="pokemon-left" data-side="left">
+                    <div class="pokemon-image-container">
+                        <img id="pokemon-left-img" src="" alt="">
+                    </div>
+                    <div class="pokemon-info">
+                        <h3 id="pokemon-left-name"></h3>
+                        <p class="pokemon-number">#<span id="pokemon-left-number"></span></p>
+                        <div class="pokemon-stats">
+                            <span class="stat">Wins: <span id="pokemon-left-wins">0</span></span>
+                            <span class="stat">Losses: <span id="pokemon-left-losses">0</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vs-divider">VS</div>
+
+                <div class="pokemon-card" id="pokemon-right" data-side="right">
+                    <div class="pokemon-image-container">
+                        <img id="pokemon-right-img" src="" alt="">
+                    </div>
+                    <div class="pokemon-info">
+                        <h3 id="pokemon-right-name"></h3>
+                        <p class="pokemon-number">#<span id="pokemon-right-number"></span></p>
+                        <div class="pokemon-stats">
+                            <span class="stat">Wins: <span id="pokemon-right-wins">0</span></span>
+                            <span class="stat">Losses: <span id="pokemon-right-losses">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rankings Screen -->
+        <div id="rankings-screen" class="screen">
+            <div class="header">
+                <button id="rankings-back-btn" class="btn btn-small">← Menu</button>
+                <h2>Rankings</h2>
+            </div>
+
+            <div class="rankings-filters">
+                <input type="text" id="search-input" placeholder="Search Pokemon..." />
+                <select id="sort-select">
+                    <option value="rating">By Rating (ELO)</option>
+                    <option value="wins">By Wins</option>
+                    <option value="losses">By Losses</option>
+                    <option value="matches">By Total Matches</option>
+                    <option value="name">By Name</option>
+                    <option value="number">By Pokedex #</option>
+                </select>
+            </div>
+
+            <div id="rankings-list" class="rankings-list">
+                <!-- Rankings will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

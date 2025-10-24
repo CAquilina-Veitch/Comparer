@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd Pokemon Memorability Ranker web app\n\n- Create mobile-first responsive design for comparing Pokemon\n- Implement ELO rating system for accurate memorability rankings\n- Add local storage for data persistence across sessions\n- Fetch all 1025 Pokemon from PokeAPI with batched requests\n- Include search, filter, and sort functionality for rankings\n- Add keyboard shortcuts for quick comparisons\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
