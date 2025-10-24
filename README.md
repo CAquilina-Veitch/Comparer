@@ -5,20 +5,30 @@ A mobile-friendly web app that ranks Pokemon based on memorability using an ELO 
 ## Features
 
 - **1000+ Pokemon**: All Pokemon from Gen 1-9 (1025 total)
+- **Dual Ranking Modes**:
+  - **VS Mode**: Head-to-head comparisons between two Pokemon
+  - **Name Test Mode**: Test name recognition with 5 Pokemon at once (faster data collection!)
 - **ELO Rating System**: Uses competitive ELO algorithm for accurate rankings
+- **Adaptive Algorithm**: Progressively focuses on lower-rated Pokemon as you collect more data
+  - 0-100 comparisons: Fully random selection
+  - 100-500 comparisons: Gradually shifts focus to less memorable Pokemon
+  - 500+ comparisons: Heavily weighted toward finding the least memorable
 - **Mobile-First Design**: Optimized for mobile devices with responsive layout
 - **Local Storage**: All data saved in your browser (no server required)
-- **Real-time Stats**: Track wins, losses, and total matches for each Pokemon
+- **Real-time Stats**: Track wins, losses, total matches, and current least memorable Pokemon
 - **Searchable Rankings**: Filter and sort Pokemon by different criteria
-- **Keyboard Shortcuts**: Use arrow keys (or A/D) to quickly compare
+- **Keyboard Shortcuts**: Arrow keys (A/D) in VS Mode, Enter in Name Test Mode
 
 ## How It Works
 
 1. Click "Start Ranking" to begin comparing Pokemon
-2. Two random Pokemon appear - click the one that's more memorable to you
+2. Choose your mode:
+   - **VS Mode**: Click the more memorable Pokemon between two options
+   - **Name Test**: Click all Pokemon you can name, then submit
 3. The app uses ELO ratings to rank all Pokemon based on your choices
-4. View rankings anytime to see which Pokemon are most/least memorable
-5. The more comparisons you make, the more accurate the rankings become
+4. As you make more comparisons, the algorithm adapts to focus on less memorable Pokemon
+5. View rankings anytime to see which Pokemon are most/least memorable
+6. The more comparisons you make, the more accurate the rankings become
 
 ## GitHub Pages Setup
 
@@ -39,6 +49,10 @@ Simply open `index.html` in a web browser. No build process or server needed!
 
 - **ELO Rating**: Standard chess ELO algorithm with K-factor of 32
 - **Starting Rating**: All Pokemon start at 1500 ELO
+- **Adaptive Selection**: Weighted random selection that increasingly favors lower-rated Pokemon
+  - Uses median rating as baseline for weighting
+  - Lower-rated Pokemon can become up to 10x more likely to appear at full bias
+- **Name Test Scoring**: Selected Pokemon gain ELO from each unselected Pokemon in the group
 - **API**: Uses PokeAPI (https://pokeapi.co) for Pokemon data
 - **Storage**: Browser localStorage for data persistence
 - **Compatibility**: Works on all modern browsers (Chrome, Firefox, Safari, Edge)

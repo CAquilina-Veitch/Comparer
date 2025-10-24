@@ -27,6 +27,8 @@
             <div class="stats">
                 <p>Total Comparisons: <span id="total-comparisons">0</span></p>
                 <p>Pokemon Loaded: <span id="pokemon-count">0</span></p>
+                <p id="least-memorable-stat" style="margin-top: 15px; font-weight: bold;"></p>
+                <p id="rating-range-stat" style="font-size: 14px; opacity: 0.9;"></p>
             </div>
         </div>
 
@@ -34,12 +36,18 @@
         <div id="battle-screen" class="screen">
             <div class="header">
                 <button id="back-to-menu-btn" class="btn btn-small">← Menu</button>
+                <div class="mode-toggle">
+                    <button id="mode-battle" class="mode-btn active">VS Mode</button>
+                    <button id="mode-nametest" class="mode-btn">Name Test</button>
+                </div>
                 <div class="comparison-count">Comparison #<span id="current-comparison">0</span></div>
             </div>
 
-            <h2 class="battle-title">Which is more memorable?</h2>
+            <h2 class="battle-title" id="battle-title">Which is more memorable?</h2>
+            <div id="bias-indicator" class="bias-indicator"></div>
 
-            <div class="battle-container">
+            <!-- VS Battle Mode -->
+            <div id="vs-mode-container" class="battle-container active-mode">
                 <div class="pokemon-card" id="pokemon-left" data-side="left">
                     <div class="pokemon-image-container">
                         <img id="pokemon-left-img" src="" alt="">
@@ -69,6 +77,15 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Name Test Mode -->
+            <div id="nametest-mode-container" class="nametest-container">
+                <p class="nametest-instructions">Click all the Pokemon you can name without looking!</p>
+                <div id="nametest-grid" class="nametest-grid">
+                    <!-- Pokemon cards will be inserted here -->
+                </div>
+                <button id="submit-nametest" class="btn btn-primary submit-nametest-btn">Submit Answers</button>
             </div>
         </div>
 

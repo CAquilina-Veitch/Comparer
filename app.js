@@ -10,8 +10,11 @@ class PokemonRanker {
     constructor() {
         this.pokemon = [];
         this.currentPair = { left: null, right: null };
+        this.currentNameTestGroup = [];
+        this.selectedNameTestIds = new Set();
         this.totalComparisons = 0;
         this.currentScreen = 'loading';
+        this.currentMode = 'battle'; // 'battle' or 'nametest'
 
         this.init();
     }
@@ -170,6 +173,25 @@ class PokemonRanker {
     updateMenuStats() {
         document.getElementById('total-comparisons').textContent = this.totalComparisons;
         document.getElementById('pokemon-count').textContent = this.pokemon.length;
+
+        // Show least memorable Pokemon stats
+        const sorted = [...this.pokemon].sort((a, b) => a.rating - b.rating);
+        const leastMemorable = sorted[0];
+        const leastMemorableStat = document.getElementById('least-memorable-stat');
+        const ratingRangeStat = document.getElementById('rating-range-stat');
+
+        if (this.totalComparisons > 0) {
+            leastMemorableStat.textContent = `Least Memorable: ${leastMemorable.name} (${leastMemorable.rating} ELO)`;
+
+            const lowestRating = sorted[0].rating;
+            const highestRating = sorted[sorted.length - 1].rating;
+            const ratingSpread = highestRating - lowestRating;
+
+            ratingRangeStat.textContent = `Rating Range: ${lowestRating} - ${highestRating} (spread: ${ratingSpread})`;
+        } else {
+            leastMemorableStat.textContent = 'Start comparing to find the least memorable!';
+            ratingRangeStat.textContent = '';
+        }
     }
 
     showBattle() {
@@ -277,6 +299,144 @@ class PokemonRanker {
         }
     }
 
+    // Name Test Mode Methods
+    showNameTest() {
+        this.currentNameTestGroup = this.getRandomGroup(5);
+        this.selectedNameTestIds.clear();
+
+        const grid = document.getElementById('nametest-grid');
+        grid.innerHTML = '';
+
+        this.currentNameTestGroup.forEach(pokemon => {
+            const card = document.createElement('div');
+            card.className = 'nametest-card';
+            card.dataset.pokemonId = pokemon.id;
+
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'nametest-card-image';
+            const img = document.createElement('img');
+            img.src = pokemon.sprite;
+            img.alt = '?';
+            imageContainer.appendChild(img);
+
+            const number = document.createElement('div');
+            number.className = 'nametest-card-number';
+            number.textContent = `#${pokemon.number}`;
+
+            card.appendChild(imageContainer);
+            card.appendChild(number);
+
+            card.addEventListener('click', () => {
+                card.classList.toggle('selected');
+                if (card.classList.contains('selected')) {
+                    this.selectedNameTestIds.add(pokemon.id);
+                } else {
+                    this.selectedNameTestIds.delete(pokemon.id);
+                }
+            });
+
+            grid.appendChild(card);
+        });
+    }
+
+    submitNameTest() {
+        // Process results: selected = wins, unselected = losses
+        this.currentNameTestGroup.forEach(pokemon => {
+            if (this.selectedNameTestIds.has(pokemon.id)) {
+                // User recognized this Pokemon - they win against the group average
+                // Calculate wins against all unselected Pokemon
+                const unselected = this.currentNameTestGroup.filter(p => !this.selectedNameTestIds.has(p.id));
+                unselected.forEach(loser => {
+                    this.calculateELO(pokemon, loser);
+                });
+            }
+        });
+
+        this.totalComparisons += this.currentNameTestGroup.length;
+        this.saveData();
+
+        // Show next group
+        this.showNameTest();
+        document.getElementById('current-comparison').textContent = this.totalComparisons;
+    }
+
+    getRandomGroup(count) {
+        // Use same weighted selection as battle mode
+        const biasFactor = Math.min(this.totalComparisons / 500, 1);
+
+        if (biasFactor < 0.2) {
+            // Early stage: fully random
+            const shuffled = [...this.pokemon].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, count);
+        }
+
+        // Later stages: weighted selection favoring lower-rated Pokemon
+        const sorted = [...this.pokemon].sort((a, b) => a.rating - b.rating);
+        const medianRating = sorted[Math.floor(sorted.length / 2)].rating;
+
+        const weightedPool = this.pokemon.map(p => {
+            const ratingDiff = medianRating - p.rating;
+            const baseWeight = 1;
+            const biasWeight = Math.max(0.1, 1 + (ratingDiff / 200) * biasFactor);
+            return {
+                pokemon: p,
+                weight: baseWeight + biasWeight * biasFactor * 3
+            };
+        });
+
+        const selected = [];
+        const remainingPool = [...weightedPool];
+
+        for (let i = 0; i < count && remainingPool.length > 0; i++) {
+            const pokemon = this.weightedRandomSelect(remainingPool);
+            selected.push(pokemon);
+            const index = remainingPool.findIndex(item => item.pokemon.id === pokemon.id);
+            if (index > -1) remainingPool.splice(index, 1);
+        }
+
+        return selected;
+    }
+
+    switchMode(mode) {
+        this.currentMode = mode;
+
+        // Update mode buttons
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.getElementById(`mode-${mode}`).classList.add('active');
+
+        // Update title and bias indicator
+        const title = document.getElementById('battle-title');
+        const biasIndicator = document.getElementById('bias-indicator');
+
+        if (mode === 'battle') {
+            title.textContent = 'Which is more memorable?';
+            document.getElementById('vs-mode-container').classList.add('active-mode');
+            document.getElementById('nametest-mode-container').classList.remove('active-mode');
+            biasIndicator.style.display = 'inline-block';
+            this.showBattle();
+        } else {
+            title.textContent = 'Name Recognition Test';
+            document.getElementById('vs-mode-container').classList.remove('active-mode');
+            document.getElementById('nametest-mode-container').classList.add('active-mode');
+            biasIndicator.style.display = 'inline-block';
+            this.showNameTest();
+        }
+
+        // Update bias indicator for both modes
+        const biasFactor = Math.min(this.totalComparisons / 500, 1);
+        if (biasFactor < 0.2) {
+            biasIndicator.textContent = '🔀 Random Mode - Building initial data';
+        } else if (biasFactor < 0.5) {
+            biasIndicator.textContent = '📊 Slightly focusing on lower-rated Pokemon';
+        } else if (biasFactor < 0.8) {
+            biasIndicator.textContent = '🎯 Focusing on less memorable Pokemon';
+        } else {
+            biasIndicator.textContent = '🔍 Hunting for the least memorable Pokemon';
+        }
+    }
+
     setupEventListeners() {
         // Menu buttons
         document.getElementById('start-ranking-btn').addEventListener('click', () => {
@@ -304,6 +464,20 @@ class PokemonRanker {
             this.selectPokemon(this.currentPair.right, this.currentPair.left);
         });
 
+        // Mode toggle
+        document.getElementById('mode-battle').addEventListener('click', () => {
+            this.switchMode('battle');
+        });
+
+        document.getElementById('mode-nametest').addEventListener('click', () => {
+            this.switchMode('nametest');
+        });
+
+        // Name test submit
+        document.getElementById('submit-nametest').addEventListener('click', () => {
+            this.submitNameTest();
+        });
+
         // Rankings screen
         document.getElementById('rankings-back-btn').addEventListener('click', () => {
             this.showScreen('menu');
@@ -324,10 +498,16 @@ class PokemonRanker {
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (this.currentScreen === 'battle') {
-                if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
-                    this.selectPokemon(this.currentPair.left, this.currentPair.right);
-                } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
-                    this.selectPokemon(this.currentPair.right, this.currentPair.left);
+                if (this.currentMode === 'battle') {
+                    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                        this.selectPokemon(this.currentPair.left, this.currentPair.right);
+                    } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                        this.selectPokemon(this.currentPair.right, this.currentPair.left);
+                    }
+                } else if (this.currentMode === 'nametest') {
+                    if (e.key === 'Enter') {
+                        this.submitNameTest();
+                    }
                 }
             }
         });

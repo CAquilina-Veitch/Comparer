@@ -174,6 +174,34 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.mode-toggle {
+    display: flex;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.mode-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+}
+
+.mode-btn.active {
+    background: white;
+    color: #667eea;
 }
 
 .comparison-count {
@@ -189,8 +217,21 @@ body {
     color: white;
     text-align: center;
     font-size: 24px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.bias-indicator {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    margin: 0 auto 20px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    display: inline-block;
+    max-width: 90%;
 }
 
 .battle-container {
@@ -288,6 +329,103 @@ body {
     font-weight: bold;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     padding: 10px 0;
+}
+
+/* Mode visibility */
+.battle-container,
+.nametest-container {
+    display: none;
+}
+
+.battle-container.active-mode,
+.nametest-container.active-mode {
+    display: flex;
+}
+
+/* Name Test Mode */
+.nametest-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+.nametest-instructions {
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 12px 20px;
+    border-radius: 12px;
+    max-width: 90%;
+}
+
+.nametest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.nametest-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+.nametest-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.nametest-card.selected {
+    background: #e8f5e9;
+    border: 3px solid var(--success-color);
+}
+
+.nametest-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    color: var(--success-color);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.nametest-card-image {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.nametest-card-image img {
+    max-width: 100px;
+    max-height: 100px;
+    image-rendering: pixelated;
+}
+
+.nametest-card-number {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 12px;
+}
+
+.submit-nametest-btn {
+    margin-top: 10px;
+    min-width: 200px;
 }
 
 /* Rankings Screen */
